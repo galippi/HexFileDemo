@@ -87,9 +87,7 @@ public class MotoHexFile extends HexFileBase{
         }catch (HexFileException e) {
           throw new HexFileException(e.Error, filename, lineOrig, lineIdx);
         }
-        byte chksum = 0;
-        for (int i = 0; i < lineData.length - 1; i++)
-          chksum = (byte)(chksum + lineData[i]);
+        byte chksum = checksum(lineData, lineData.length - 1);
         chksum = (byte)(0xff - chksum);
         if (chksum != lineData[lineData.length - 1])
            throw new HexFileException("Invalid checksum", filename, lineOrig, lineIdx);

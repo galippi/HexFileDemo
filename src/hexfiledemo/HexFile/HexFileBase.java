@@ -67,6 +67,13 @@ abstract public class HexFileBase {
     if (d < 0) d = 256 + d;
     return d;
   }
+  byte checksum(byte[] lineData, int len)
+  {
+    byte chksum = 0;
+    for (int i = 0; i < len; i++)
+      chksum = (byte)(chksum + lineData[i]);
+    return chksum;
+  }
   abstract public void load(String filename) throws HexFileException;
   public ArrayList<HexFileRecord> data;
 }

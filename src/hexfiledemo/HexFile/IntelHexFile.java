@@ -57,9 +57,7 @@ public class IntelHexFile extends HexFileBase{
         int recLen = byte2int(lineData[0]);
         if (lineData.length != (recLen + 5))
            throw new HexFileException("Invalid record length data ", filename, lineOrig, lineIdx);
-        byte chksum = 0;
-        for (int i = 0; i < lineData.length - 1; i++)
-          chksum = (byte)(chksum + lineData[i]);
+        byte chksum = checksum(lineData, lineData.length - 1);
         chksum = (byte)(256 - chksum);
         if (chksum != lineData[lineData.length - 1])
            throw new HexFileException("Invalid checksum", filename, lineOrig, lineIdx);
