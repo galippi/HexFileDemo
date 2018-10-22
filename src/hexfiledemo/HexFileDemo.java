@@ -70,11 +70,12 @@ public class HexFileDemo {
     try {
       TestWithException("TestData/a1.s19", "Invalid checksum");
       byte[] data1 = {0x00, 0x5A, (byte)0xA5, (byte)0xFF};
-      TestContent("TestData/a2.s19", 0x0000, data1);
-      MotoHexFile file = new MotoHexFile("TestData/a1.s19");
-      printHexFile(file);
-      IntelHexFile file2 = new IntelHexFile("b1.hex");
-      printHexFile(file2);
+      TestContent("TestData/a2.s19",     0x0000, data1);
+      TestContent("TestData/a3.s19",     0x0000, data1);
+      TestContent("TestData/a4.s19",     0x0000, data1); // pack testing
+      TestContent("TestData/a5.s19",     0x89AB, data1); // pack testing
+      TestContent("TestData/a6.s19",   0x123456, data1); // pack testing
+      TestContent("TestData/a7.s19", 0x87654321, data1); // pack testing
     }catch (HexFileException e) {
       System.out.println("Error: " + e.toString());
     }
