@@ -3,5 +3,3 @@ build/*
 *.bak
 *.xcm
 nbproject/private/*
-*.s19
-*.hex
