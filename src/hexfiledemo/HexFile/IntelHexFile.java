@@ -93,5 +93,6 @@ public class IntelHexFile extends HexFileBase{
     }catch (IOException e) {
       throw new HexFileException("Unable to read line", filename, null, lineIdx);
     }
+    pack();
   }
 }

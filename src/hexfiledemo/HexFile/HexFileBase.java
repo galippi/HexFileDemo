@@ -5,14 +5,15 @@
  */
 package hexfiledemo.HexFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  *
  * @author liptakok
  */
-abstract public class HexFileBase {
+public class HexFileBase {
   public HexFileBase()
   {
     data = new ArrayList<>();
@@ -74,6 +75,52 @@ abstract public class HexFileBase {
       chksum = (byte)(chksum + lineData[i]);
     return chksum;
   }
-  abstract public void load(String filename) throws HexFileException;
+  void pack()
+  {
+    boolean modified = true;
+    while(modified)
+    {
+      modified = false;
+      for(int i = 0; (i < size() - 1) && !modified; i++)
+      {
+        for(int j = i + 1; (j < size()) && !modified; j++)
+        {
+          if (data.get(i).end == data.get(j).address)
+          {
+            modified = true;
+            HexFileRecord old = data.get(j);
+            data.remove(old);
+            InsertRecord(old.address, old.getData());
+          }
+        }
+      }
+    }
+  }
+  public HexFileBase compare(HexFileBase other)
+  {
+    HexFileBase result = new HexFileBase();
+    SortedSet set = new TreeSet();
+    for (int i = 0; i < size(); i++)
+    {
+      set.add(new HexBlockHeader(data.get(i).address, data.get(i).size()));
+    }
+    for (int i = 0; i < other.size(); i++)
+    {
+      set.add(new HexBlockHeader(other.get(i).address, other.get(i).size()));
+    }
+    return result;
+  }
+  public int size()
+  {
+    return data.size();
+  }
+  public HexFileRecord get(int idx)
+  {
+    return data.get(idx);
+  }
+  public void load(String filename) throws HexFileException
+  {
+    throw new HexFileException("Invalid call of load of HexFileBase", "", "", -1);
+  }
   public ArrayList<HexFileRecord> data;
 }

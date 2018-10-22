@@ -22,7 +22,7 @@ public class HexFileDemo {
       for (int i = 0; i < file.data.size(); i++)
       {
         HexFileRecord rec = file.data.get(i);
-        System.out.println("line: " + i + " addr=" + rec.getAddress() + " len=" + rec.size());
+        System.out.println("Record: " + i + " addr=" + rec.getAddress() + " len=" + rec.size());
         String str = "";
         byte[] data = rec.getData();
         for (int j = 0; j < rec.size(); j++)
@@ -32,12 +32,46 @@ public class HexFileDemo {
         System.out.println("  data:" + str);
       }
   }
+  static void TestWithException(String filename, String ExceptionText) throws HexFileException
+  {
+    try {
+      new MotoHexFile(filename);
+      throw new HexFileException("Test case is failed - no exception", filename, "", -1);
+    }catch (HexFileException e) {
+      if (e.Error.contentEquals(ExceptionText))
+      {
+        System.out.println("Test case ok " + filename + "!");
+      }else
+      {
+        throw new HexFileException("Test case is failed - no exception", filename, "", -1);
+      }
+    }
+  }
+  static void TestContent(String filename, int address, byte[] data) throws HexFileException
+  {
+    HexFileBase file = new MotoHexFile(filename);
+    if (file.size() != 1)
+      throw new HexFileException("Test case is failed - block count failure", filename, "", -1);
+    HexFileRecord rec = file.get(0);
+    if (rec.getAddress() != address)
+      throw new HexFileException("Test case is failed - address failure", filename, "", -1);
+    if (rec.size() != data.length)
+      throw new HexFileException("Test case is failed - size failure", filename, "", -1);
+    byte[] recData = rec.getData();
+    for (int i = 0; i < data.length; i++)
+      if (data[i] != recData[i])
+        throw new HexFileException("Test case is failed - data failure", filename, "", -1);
+    System.out.println("Test case ok " + filename + "!");
+  }
   /**
    * @param args the command line arguments
    */
   public static void main(String[] args) {
     try {
-      MotoHexFile file = new MotoHexFile("a4.s19");
+      TestWithException("TestData/a1.s19", "Invalid checksum");
+      byte[] data1 = {0x00, 0x5A, (byte)0xA5, (byte)0xFF};
+      TestContent("TestData/a2.s19", 0x0000, data1);
+      MotoHexFile file = new MotoHexFile("TestData/a1.s19");
       printHexFile(file);
       IntelHexFile file2 = new IntelHexFile("b1.hex");
       printHexFile(file2);
