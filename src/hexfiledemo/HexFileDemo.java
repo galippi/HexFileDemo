@@ -5,6 +5,7 @@
  */
 package hexfiledemo;
 
+import hexfiledemo.HexFile.HexFile;
 import hexfiledemo.HexFile.HexFileBase;
 import hexfiledemo.HexFile.HexFileException;
 import hexfiledemo.HexFile.HexFileRecord;
@@ -49,7 +50,7 @@ public class HexFileDemo {
   }
   static void TestContent(String filename, int address, byte[] data) throws HexFileException
   {
-    HexFileBase file = new MotoHexFile(filename);
+    HexFileBase file = new HexFile(filename);
     if (file.size() != 1)
       throw new HexFileException("Test case is failed - block count failure", filename, "", -1);
     HexFileRecord rec = file.get(0);
@@ -68,14 +69,15 @@ public class HexFileDemo {
    */
   public static void main(String[] args) {
     try {
-      TestWithException("TestData/a1.s19", "Invalid checksum");
+      TestWithException("TestData/a1.s19", "Invalid checksum"); // invalid checksum report
       byte[] data1 = {0x00, 0x5A, (byte)0xA5, (byte)0xFF};
-      TestContent("TestData/a2.s19",     0x0000, data1);
-      TestContent("TestData/a3.s19",     0x0000, data1);
-      TestContent("TestData/a4.s19",     0x0000, data1); // pack testing
-      TestContent("TestData/a5.s19",     0x89AB, data1); // pack testing
-      TestContent("TestData/a6.s19",   0x123456, data1); // pack testing
-      TestContent("TestData/a7.s19", 0x87654321, data1); // pack testing
+      TestContent("TestData/a2.s19",     0x0000, data1);  // basic file load test - S1 record
+      TestContent("TestData/a3.s19",     0x0000, data1); // insertRecord test - S1 record
+      TestContent("TestData/a4.s19",     0x0000, data1); // pack testing - S1 record
+      TestContent("TestData/a5.s19",     0x89AB, data1); // pack testing - S1 record
+      TestContent("TestData/a6.s19",   0x123456, data1); // pack testing - S2 record
+      TestContent("TestData/a7.s19", 0x87654321, data1); // pack testing - S3 record
+      TestContent("TestData/i2.hex",     0x0000, data1);  // basic file load test - intel hex record
     }catch (HexFileException e) {
       System.out.println("Error: " + e.toString());
     }
