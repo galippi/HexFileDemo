@@ -9,7 +9,6 @@ import hexfiledemo.HexFile.HexFile;
 import hexfiledemo.HexFile.HexFileBase;
 import hexfiledemo.HexFile.HexFileException;
 import hexfiledemo.HexFile.HexFileRecord;
-import hexfiledemo.HexFile.IntelHexFile;
 import hexfiledemo.HexFile.MotoHexFile;
 
 /**
