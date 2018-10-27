@@ -17,6 +17,10 @@ public class HexFileRecord {
     java.lang.System.arraycopy(data, 0, this.data, 0, data.length);
     end = this.address + data.length;
   }
+  public boolean insert(HexFileRecord rec)
+  {
+    return insert(rec.address, rec.data);
+  }
   public boolean insert(int address, byte[] data)
   {
     if (end == address)

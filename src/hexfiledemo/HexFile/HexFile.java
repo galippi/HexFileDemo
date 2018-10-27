@@ -5,6 +5,9 @@
  */
 package hexfiledemo.HexFile;
 
+import java.util.Iterator;
+import java.util.Map;
+
 /**
  *
  * @author liptakok
@@ -33,10 +36,11 @@ public class HexFile extends HexFileBase {
         throw new HexFileException("Unable to load file", filename, "", -1);
       }
     }
-    for (int i = 0; i < file.size(); i++)
-    {
-      HexFileRecord rec = file.get(i);
-      InsertRecord(rec.address, rec.getData());
+    Iterator i = file.beginList.entrySet().iterator();
+    while(i.hasNext()) {
+      Map.Entry me = (Map.Entry)i.next();
+      HexFileRecord rec = (HexFileRecord)me.getValue();
+      InsertRecord(rec);
     }
   }
 }

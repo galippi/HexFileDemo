@@ -5,9 +5,9 @@
  */
 package hexfiledemo.HexFile;
 
-import java.util.ArrayList;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  *
@@ -16,22 +16,44 @@ import java.util.TreeSet;
 public class HexFileBase {
   public HexFileBase()
   {
-    data = new ArrayList<>();
+    beginList = new TreeMap();
+    endList = new TreeMap();
+  }
+  public void InsertRecord(HexFileRecord rec)
+  {
+    InsertRecord(rec.address, rec.getData());
   }
   public void InsertRecord(int address, byte[] data)
   {
-    boolean done = false;
-    for (int i = 0; i < this.data.size(); i++)
+    int endAddress = address + data.length;
+    HexFileRecord rec = (HexFileRecord)endList.get(address);
+    if (rec != null)
     {
-      if (this.data.get(i).insert(address, data))
+      if (rec.insert(address, data))
       {
-        done = true;
-        break;
+        endList.remove(address);
+        endList.put(endAddress, rec);
+      }else
+        rec = null;
+    }
+    if (rec == null)
+    {
+      rec = (HexFileRecord)beginList.get(endAddress);
+      if (rec != null)
+      {
+        if (rec.insert(address, data))
+        {
+          beginList.remove(endAddress);
+          beginList.put(address, rec);
+        }else
+          rec = null;
       }
     }
-    if (!done)
+    if (rec == null)
     {
-      this.data.add(new HexFileRecord(address, data));
+      rec = new HexFileRecord(address, data);
+      beginList.put(address, rec);
+      endList.put(endAddress, rec);
     }
   }
   byte hex2dec(char ch) throws HexFileException
@@ -81,16 +103,25 @@ public class HexFileBase {
     while(modified)
     {
       modified = false;
-      for(int i = 0; (i < size() - 1) && !modified; i++)
-      {
-        for(int j = i + 1; (j < size()) && !modified; j++)
+      Iterator i = beginList.entrySet().iterator();
+      while(i.hasNext()) {
+        Map.Entry me = (Map.Entry)i.next();
+        int address = (int)me.getKey();
+        HexFileRecord rec = (HexFileRecord)me.getValue();
+        int endAddress = rec.end;
+        HexFileRecord recDest = (HexFileRecord)endList.get(address);
+        if (recDest != null)
         {
-          if (data.get(i).end == data.get(j).address)
+          if (recDest.insert(rec))
           {
+            endList.remove(address);
+            endList.put(endAddress, recDest);
+            beginList.remove(address);
             modified = true;
-            HexFileRecord old = data.get(j);
-            data.remove(old);
-            InsertRecord(old.address, old.getData());
+          }else
+          { // error case - what to do???
+            System.err.println("Error: unable to insert record!");
+            System.exit(1);
           }
         }
       }
@@ -99,28 +130,51 @@ public class HexFileBase {
   public HexFileBase compare(HexFileBase other)
   {
     HexFileBase result = new HexFileBase();
-    SortedSet set = new TreeSet();
-    for (int i = 0; i < size(); i++)
-    {
-      set.add(new HexBlockHeader(data.get(i).address, data.get(i).size()));
-    }
-    for (int i = 0; i < other.size(); i++)
-    {
-      set.add(new HexBlockHeader(other.get(i).address, other.get(i).size()));
-    }
     return result;
   }
   public int size()
   {
-    return data.size();
+    return beginList.size();
   }
-  public HexFileRecord get(int idx)
+  public Iterator getIterator()
   {
-    return data.get(idx);
+    it = beginList.entrySet().iterator();
+    return it;
+  }
+  public HexFileRecord get(int address)
+  {
+    return (HexFileRecord)beginList.get(address);
+  }
+  public void initIterator()
+  {
+    it = beginList.entrySet().iterator();
+  }
+  public HexFileRecord getFirst()
+  {
+    initIterator();
+    return getNext();
+  }
+  public boolean hasNext()
+  {
+    return it.hasNext();
+  }
+  public HexFileRecord getNext()
+  {
+    if(it.hasNext())
+    {
+      Map.Entry me = (Map.Entry)it.next();
+      return (HexFileRecord)me.getValue();
+    }else
+    {
+      return null;
+    }
   }
   public void load(String filename) throws HexFileException
   {
     throw new HexFileException("Invalid call of load of HexFileBase", "", "", -1);
   }
-  public ArrayList<HexFileRecord> data;
+  //public ArrayList<HexFileRecord> data;
+  TreeMap beginList;
+  TreeMap endList;
+  Iterator it;
 }

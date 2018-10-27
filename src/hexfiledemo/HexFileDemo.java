@@ -10,6 +10,8 @@ import hexfiledemo.HexFile.HexFileBase;
 import hexfiledemo.HexFile.HexFileException;
 import hexfiledemo.HexFile.HexFileRecord;
 import hexfiledemo.HexFile.MotoHexFile;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  *
@@ -19,9 +21,10 @@ public class HexFileDemo {
 
   static void printHexFile(HexFileBase file)
   {
-      for (int i = 0; i < file.data.size(); i++)
-      {
-        HexFileRecord rec = file.data.get(i);
+      Iterator i = file.getIterator();
+      while(i.hasNext()) {
+        Map.Entry me = (Map.Entry)i.next();
+        HexFileRecord rec = (HexFileRecord)me.getValue();
         System.out.println("Record: " + i + " addr=" + rec.getAddress() + " len=" + rec.size());
         String str = "";
         byte[] data = rec.getData();
@@ -52,7 +55,7 @@ public class HexFileDemo {
     HexFileBase file = new HexFile(filename);
     if (file.size() != 1)
       throw new HexFileException("Test case is failed - block count failure", filename, "", -1);
-    HexFileRecord rec = file.get(0);
+    HexFileRecord rec = file.getFirst();
     if (rec.getAddress() != address)
       throw new HexFileException("Test case is failed - address failure", filename, "", -1);
     if (rec.size() != data.length)
@@ -68,6 +71,26 @@ public class HexFileDemo {
    */
   public static void main(String[] args) {
     try {
+      HexFileBase fileHex = new HexFile("b2.hex");
+      fileHex.initIterator();
+      HexFileRecord rec;
+      while((rec = fileHex.getNext()) != null) {
+        byte[] data = rec.getData();
+        if ((data.length % 4) != 0)
+          throw new HexFileException("Data record must be 32 bits wide!", "", "", -1);
+        for(int j = 0; j < data.length; j += 4)
+        {
+          byte tmp = data[j];
+          data[j] = data[j + 3];
+          data[j + 3] = tmp;
+          tmp = data[j +1];
+          data[j + 1] = data[j + 2];
+          data[j + 2] = tmp;
+        }
+      }
+      printHexFile(fileHex);
+      HexFileBase fileS19 = new HexFile("b2.s19");
+      printHexFile(fileS19);
       TestWithException("TestData/a1.s19", "Invalid checksum"); // invalid checksum report
       byte[] data1 = {0x00, 0x5A, (byte)0xA5, (byte)0xFF};
       TestContent("TestData/a2.s19",     0x0000, data1);  // basic file load test - S1 record
