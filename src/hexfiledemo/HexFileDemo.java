@@ -5,6 +5,7 @@
  */
 package hexfiledemo;
 
+import hexfiledemo.HexFile.HexBlockHeader;
 import hexfiledemo.HexFile.HexFile;
 import hexfiledemo.HexFile.HexFileBase;
 import hexfiledemo.HexFile.HexFileException;
@@ -66,12 +67,30 @@ public class HexFileDemo {
         throw new HexFileException("Test case is failed - data failure", filename, "", -1);
     System.out.println("Test case ok " + filename + "!");
   }
+  static void TestCompareSame(String filename1, String filename2) throws HexFileException
+  {
+    HexFileBase file1 = new HexFile(filename1);
+    HexFileBase file2 = new HexFile(filename2);
+    if (file1.compare(file2) != null)
+      throw new HexFileException("Test case is failed - TestCompareSame failure", filename1 + " - " + filename2, "", -1);
+    System.out.println("Test case ok TestCompareSame " + filename1 + " - " + filename2 + "!");
+  }
   /**
    * @param args the command line arguments
    */
   public static void main(String[] args) {
     try {
+      TestCompareSame("TestData/a2.s19", "TestData/a2.s19");
+      TestCompareSame("TestData/a2.s19", "TestData/a3.s19");
+      TestCompareSame("TestData/a2.s19", "TestData/a4.s19");
+      TestCompareSame("TestData/a2.s19", "TestData/i2.hex");
       HexFileBase fileHex = new HexFile("b2.hex");
+      HexFileBase f2 = new HexFile("b2.hex");
+      fileHex.compare(f2);
+      HexFileBase f3 = new HexFile("TestData/a2.s19");
+      HexBlockHeader[] hdr = fileHex.compare(f3);
+      for (int i = 0; i < hdr.length; i++)
+        System.out.println(i + ": " + hdr[i].begin + " len=" + hdr[i].len);
       fileHex.initIterator();
       HexFileRecord rec;
       while((rec = fileHex.getNext()) != null) {

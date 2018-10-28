@@ -5,6 +5,7 @@
  */
 package hexfiledemo.HexFile;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -127,10 +128,160 @@ public class HexFileBase {
       }
     }
   }
-  public HexFileBase compare(HexFileBase other)
+  public HexBlockHeader[] compare(HexFileBase other)
   {
-    HexFileBase result = new HexFileBase();
-    return result;
+    TreeMap ranges = new TreeMap();
+    HexFileRecord rec;
+    while((rec = getNext()) != null)
+    {
+      ranges.put(rec.address, new Integer(rec.end));
+      ranges.put(rec.end, new Integer(rec.end));
+    }
+    while((rec = other.getNext()) != null)
+    {
+      ranges.put(rec.address, new Integer(rec.end));
+      ranges.put(rec.end, new Integer(rec.end));
+    }
+    ArrayList<HexBlockHeader> result = new ArrayList<>();
+    Iterator it = ranges.entrySet().iterator();
+    while(it.hasNext())
+    {
+      Map.Entry me = (Map.Entry)it.next();
+      int address = (int)me.getKey();
+      rec = get(address);
+      HexFileRecord recOther = other.get(address);
+      if (recOther != null)
+      {
+        
+      }
+    }
+    HexFileRecord recThis = this.getFirst();
+    HexFileRecord recOther = other.getFirst();
+    int address;
+    if (recThis.address < recOther.address)
+      address = recThis.address;
+    else
+      address = recOther.address;
+    while((recThis != null) && (recOther != null))
+    {
+      if ((recThis.isIn(address)) && (recOther.isIn(address)))
+      {
+        int end = recThis.end;
+        if (end > recOther.end)
+          end = recOther.end;
+        int idxThis = recThis.address - address;
+        int idxOther = recOther.address - address;
+        byte[] dataThis = recThis.getData();
+        byte[] dataOther = recOther.getData();
+        int diffLen = 0;
+        int diffAddress = 0;
+        for(int j = address; j < end; j++)
+        {
+          if (dataThis[idxThis] != dataOther[idxOther])
+          {
+            if (diffLen == 0)
+            {
+              diffAddress = j;
+            }
+            diffLen++;
+          }else
+          if (diffLen != 0)
+          { // again same data - store block
+            HexBlockHeader hdr = new HexBlockHeader(diffAddress, diffLen);
+            result.add(hdr);
+            diffLen = 0;
+          }
+        }
+        if (diffLen != 0)
+        { // again same data - store block
+          HexBlockHeader hdr = new HexBlockHeader(diffAddress, diffLen);
+          result.add(hdr);
+        }
+        address = end;
+      }else
+      if (recThis.isIn(address))
+      {
+        int end = recThis.end;
+        if (end >= recOther.address)
+          end = recOther.address;
+        HexBlockHeader hdr = new HexBlockHeader(address, end - address);
+        result.add(hdr);
+        address = end;
+      }else
+      if (recOther.isIn(address))
+      {
+        int end = recOther.end;
+        if (end >= recThis.address)
+          end = recThis.address;
+        HexBlockHeader hdr = new HexBlockHeader(address, end - address);
+        result.add(hdr);
+        address = end;
+      }else
+      {
+        if (address >= recThis.end)
+        {
+          recThis = this.getNext();
+        }
+        if (address >= recOther.end)
+        {
+          recOther = other.getNext();
+        }
+        if ((recThis != null) && (recOther != null))
+        {
+          if (recThis.address < recOther.address)
+          {
+            if (recThis.address <= address)
+            {
+              if (recOther.address <= address)
+              {
+              }else
+              {
+                address = recOther.address;
+              }
+            }else
+            {
+              address = recThis.address;
+            }
+          }else
+          {
+            if (recOther.address <= address)
+            {
+              address = recThis.address;
+            }else
+            {
+              address = recOther.address;
+            }
+          }
+        }
+      }
+    }
+    HexFileBase ptr = this;
+    if (recOther != null)
+    {
+      recThis = recOther; /* recThis was surely null */
+      ptr = other;
+    }
+    if (recThis != null)
+    {
+      if (address < recThis.address)
+        address = recThis.address;
+      if (address < recThis.end)
+      {
+        HexBlockHeader hdr = new HexBlockHeader(address, recThis.end - address);
+        result.add(hdr);
+      }
+      while((recThis = ptr.getNext()) != null)
+      {
+        HexBlockHeader hdr = new HexBlockHeader(recThis.address, recThis.size());
+        result.add(hdr);
+      }
+    }
+    if (result.isEmpty())
+      return null;
+    HexBlockHeader[] result2 = new HexBlockHeader[result.size()];
+    for (int i = 0; i < result2.length; i++)
+      result2[i] = result.get(i);
+    return result2;
   }
   public int size()
   {
@@ -156,16 +307,26 @@ public class HexFileBase {
   }
   public boolean hasNext()
   {
-    return it.hasNext();
+    if (it == null)
+      return false;
+    if (it.hasNext())
+      return true;
+    it = null;
+    return false;
   }
   public HexFileRecord getNext()
   {
+    if (it == null)
+    {
+      initIterator();
+    }
     if(it.hasNext())
     {
       Map.Entry me = (Map.Entry)it.next();
       return (HexFileRecord)me.getValue();
     }else
     {
+      it = null;
       return null;
     }
   }
