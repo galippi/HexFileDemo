@@ -103,6 +103,7 @@ public class HexFileDemo {
       TestCompareSame("TestData/a2.s19", "TestData/a4.s19");
       TestCompareSame("TestData/a2.s19", "TestData/i2.hex");
       TestCompareSame("TestData/a5.s19", "TestData/i3.hex");
+      TestCompareSame("TestData/a7.s19", "TestData/i4.hex");
       HexBlockHeader[] diff1 = {new HexBlockHeader(0, 4), new HexBlockHeader(0x89ab, 4)};
       TestCompareDifferent("TestData/a2.s19", "TestData/a5.s19", diff1);
       HexFileBase fileHex = new HexFile("b2.hex");
