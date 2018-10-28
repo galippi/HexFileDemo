@@ -60,7 +60,10 @@ public class IntelHexFile extends HexFileBase{
         byte chksum = checksum(lineData, lineData.length - 1);
         chksum = (byte)(256 - chksum);
         if (chksum != lineData[lineData.length - 1])
-           throw new HexFileException("Invalid checksum", filename, lineOrig, lineIdx);
+        {
+          System.out.println("Checksum error " + byte2int(chksum) + "<->"+byte2int(lineData[lineData.length - 1]));
+          throw new HexFileException("Invalid checksum", filename, lineOrig, lineIdx);
+        }
         int addr = (byte2int(lineData[1]) << 8) + byte2int(lineData[2]);
         switch (byte2int(lineData[3]))
         {
