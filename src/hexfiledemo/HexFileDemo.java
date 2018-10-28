@@ -75,6 +75,24 @@ public class HexFileDemo {
       throw new HexFileException("Test case is failed - TestCompareSame failure", filename1 + " - " + filename2, "", -1);
     System.out.println("Test case ok TestCompareSame " + filename1 + " - " + filename2 + "!");
   }
+  static void TestCompareDifferent(String filename1, String filename2, HexBlockHeader[] diff) throws HexFileException
+  {
+    HexFileBase file1 = new HexFile(filename1);
+    HexFileBase file2 = new HexFile(filename2);
+    HexBlockHeader[] diffResult = file1.compare(file2);
+    if (diffResult == null)
+      throw new HexFileException("Test case is failed - TestCompareDifferent - null failure", filename1 + " - " + filename2, "", -1);
+    if (diff.length != diffResult.length)
+      throw new HexFileException("Test case is failed - TestCompareDifferent - length failure", filename1 + " - " + filename2, "", -1);
+    for (int i = 0; i < diff.length; i++)
+    {
+      if ((diff[i].begin != diffResult[i].begin) ||
+          (diff[i].begin != diffResult[i].begin) ||
+          (diff[i].begin != diffResult[i].begin))
+        throw new HexFileException("Test case is failed - TestCompareDifferent - block " + i + " failure", filename1 + " - " + filename2, "", -1);
+    }
+    System.out.println("Test case ok TestCompareDifferent " + filename1 + " - " + filename2 + "!");
+  }
   /**
    * @param args the command line arguments
    */
@@ -84,6 +102,9 @@ public class HexFileDemo {
       TestCompareSame("TestData/a2.s19", "TestData/a3.s19");
       TestCompareSame("TestData/a2.s19", "TestData/a4.s19");
       TestCompareSame("TestData/a2.s19", "TestData/i2.hex");
+      TestCompareSame("TestData/a5.s19", "TestData/i3.hex");
+      HexBlockHeader[] diff1 = {new HexBlockHeader(0, 4), new HexBlockHeader(0x89ab, 4)};
+      TestCompareDifferent("TestData/a2.s19", "TestData/a5.s19", diff1);
       HexFileBase fileHex = new HexFile("b2.hex");
       HexFileBase f2 = new HexFile("b2.hex");
       fileHex.compare(f2);
