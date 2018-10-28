@@ -130,31 +130,7 @@ public class HexFileBase {
   }
   public HexBlockHeader[] compare(HexFileBase other)
   {
-    TreeMap ranges = new TreeMap();
-    HexFileRecord rec;
-    while((rec = getNext()) != null)
-    {
-      ranges.put(rec.address, new Integer(rec.end));
-      ranges.put(rec.end, new Integer(rec.end));
-    }
-    while((rec = other.getNext()) != null)
-    {
-      ranges.put(rec.address, new Integer(rec.end));
-      ranges.put(rec.end, new Integer(rec.end));
-    }
     ArrayList<HexBlockHeader> result = new ArrayList<>();
-    Iterator it = ranges.entrySet().iterator();
-    while(it.hasNext())
-    {
-      Map.Entry me = (Map.Entry)it.next();
-      int address = (int)me.getKey();
-      rec = get(address);
-      HexFileRecord recOther = other.get(address);
-      if (recOther != null)
-      {
-        
-      }
-    }
     HexFileRecord recThis = this.getFirst();
     HexFileRecord recOther = other.getFirst();
     int address;
