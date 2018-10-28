@@ -57,6 +57,10 @@ public class HexFileRecord {
   {
     return data;
   }
+  public boolean isIn(int address)
+  {
+    return ((address >= this.address) && (address < end));
+  }
   int address;
   int end;
   byte[] data;
