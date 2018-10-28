@@ -167,6 +167,7 @@ public class HexFileBase {
             result.add(hdr);
             diffLen = 0;
           }
+          idxThis++; idxOther++;
         }
         if (diffLen != 0)
         { // again same data - store block
