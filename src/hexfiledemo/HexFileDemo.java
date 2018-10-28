@@ -106,6 +106,15 @@ public class HexFileDemo {
       TestCompareSame("TestData/a7.s19", "TestData/i4.hex");
       HexBlockHeader[] diff1 = {new HexBlockHeader(0, 4), new HexBlockHeader(0x89ab, 4)};
       TestCompareDifferent("TestData/a2.s19", "TestData/a5.s19", diff1);
+      HexBlockHeader[] diff2 = {new HexBlockHeader(0, 1)};
+      TestCompareDifferent("TestData/a2.s19", "TestData/i5.hex", diff2);
+      HexBlockHeader[] diff3 = {new HexBlockHeader(1, 1)};
+      TestCompareDifferent("TestData/a2.s19", "TestData/i5.1.hex", diff3);
+      HexBlockHeader[] diff4 = {new HexBlockHeader(0, 2)};
+      TestCompareDifferent("TestData/a2.s19", "TestData/i5.2.hex", diff4);
+      HexBlockHeader[] diff5 = {new HexBlockHeader(0, 1), new HexBlockHeader(2, 1)};
+      TestCompareDifferent("TestData/a2.s19", "TestData/i5.3.hex", diff5);
+
       HexFileBase fileHex = new HexFile("b2.hex");
       HexFileBase f2 = new HexFile("b2.hex");
       fileHex.compare(f2);
