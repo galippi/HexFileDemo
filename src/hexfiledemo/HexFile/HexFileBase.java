@@ -323,7 +323,25 @@ public class HexFileBase {
   {
     throw new HexFileException("Invalid call of load of HexFileBase", "", "", -1);
   }
-  //public ArrayList<HexFileRecord> data;
+  public void SwapU32() throws HexFileException
+  {
+    initIterator();
+    HexFileRecord rec;
+    while((rec = getNext()) != null) {
+      byte[] data = rec.getData();
+      if ((data.length % 4) != 0)
+        throw new HexFileException("Data record must be 32 bits wide!", "", "", -1);
+      for(int j = 0; j < data.length; j += 4)
+      {
+        byte tmp = data[j];
+        data[j] = data[j + 3];
+        data[j + 3] = tmp;
+        tmp = data[j +1];
+        data[j + 1] = data[j + 2];
+        data[j + 2] = tmp;
+      }
+    }
+  }
   TreeMap beginList;
   TreeMap endList;
   Iterator it;
