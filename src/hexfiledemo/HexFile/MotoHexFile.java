@@ -103,13 +103,25 @@ public class MotoHexFile extends HexFileBase{
         {
           byte[] dataRec = new byte[lineData.length - addrLength - 2];
           java.lang.System.arraycopy(lineData, addrLength + 1, dataRec, 0, dataRec.length);
-          InsertRecord(addr, dataRec);
+          try {
+            InsertRecord(addr, dataRec);
+          }catch (HexFileException e) {
+            e.filename = filename;
+            e.lineIdx = lineIdx;
+            e.line = lineOrig;
+            throw e;
+          }
         }
         lineIdx++;
       }
     }catch (IOException e) {
       throw new HexFileException("Unable to read line", filename, null, lineIdx);
     }
-    pack();
+    try {
+      pack();
+    }catch (HexFileException e) {
+      e.filename = filename;
+      throw e;
+    }
   }
 }

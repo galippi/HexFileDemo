@@ -20,11 +20,11 @@ public class HexFileBase {
     beginList = new TreeMap();
     endList = new TreeMap();
   }
-  public void InsertRecord(HexFileRecord rec)
+  public void InsertRecord(HexFileRecord rec) throws HexFileException
   {
     InsertRecord(rec.address, rec.getData());
   }
-  public void InsertRecord(int address, byte[] data)
+  public void InsertRecord(int address, byte[] data) throws HexFileException
   {
     int endAddress = address + data.length;
     HexFileRecord rec = (HexFileRecord)endList.get(address);
@@ -53,6 +53,8 @@ public class HexFileBase {
     if (rec == null)
     {
       rec = new HexFileRecord(address, data);
+      if (beginList.get(address) != null)
+        throw new HexFileException("Overlapping hex file address=" + Integer.toHexString(address), null, null, -1);
       beginList.put(address, rec);
       endList.put(endAddress, rec);
     }
@@ -98,7 +100,7 @@ public class HexFileBase {
       chksum = (byte)(chksum + lineData[i]);
     return chksum;
   }
-  void pack()
+  void pack() throws HexFileException
   {
     boolean modified = true;
     while(modified)
@@ -126,6 +128,16 @@ public class HexFileBase {
           }
         }
       }
+    }
+    // checking overlapping blocks
+    initIterator();
+    HexFileRecord rec0 = getNext();
+    if (rec0 == null)
+      throw new HexFileException("Empty hex file", null, null, -1);
+    HexFileRecord rec1;
+    while((rec1 = getNext()) != null) {
+      if (rec0.end >= rec1.address)
+        throw new HexFileException("Overlapping hex file address=" + Integer.toHexString(rec1.address), null, null, -1);
     }
   }
   public HexBlockHeader[] compare(HexFileBase other)

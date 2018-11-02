@@ -42,9 +42,9 @@ public class HexFileDemo {
       new MotoHexFile(filename);
       throw new HexFileException("Test case is failed - no exception", filename, "", -1);
     }catch (HexFileException e) {
-      if (e.Error.contentEquals(ExceptionText))
+      if (e.Error.startsWith(ExceptionText))
       {
-        System.out.println("Test case ok " + filename + "!");
+        System.out.println("Test case ok TestWithException " + filename + "!");
       }else
       {
         throw new HexFileException("Test case is failed - no exception", filename, "", -1);
@@ -65,7 +65,7 @@ public class HexFileDemo {
     for (int i = 0; i < data.length; i++)
       if (data[i] != recData[i])
         throw new HexFileException("Test case is failed - data failure", filename, "", -1);
-    System.out.println("Test case ok " + filename + "!");
+    System.out.println("Test case ok TestContent " + filename + "!");
   }
   static void TestCompareSame(String filename1, String filename2) throws HexFileException
   {
@@ -114,6 +114,8 @@ public class HexFileDemo {
       TestCompareDifferent("TestData/a2.s19", "TestData/i5.2.hex", diff4);
       HexBlockHeader[] diff5 = {new HexBlockHeader(0, 1), new HexBlockHeader(2, 1)};
       TestCompareDifferent("TestData/a2.s19", "TestData/i5.3.hex", diff5);
+      TestWithException("TestData/a8.s19", "Overlapping hex file address=");
+      TestWithException("TestData/a9.s19", "Overlapping hex file address=");
 
       HexFileBase fileHex = new HexFile("b2.hex");
       HexFileBase f2 = new HexFile("b2.hex");

@@ -71,7 +71,14 @@ public class IntelHexFile extends HexFileBase{
             addr = addr + addrBase;
             byte[] dataRec = new byte[lineData.length - 5];
             java.lang.System.arraycopy(lineData, 4, dataRec, 0, dataRec.length);
-            InsertRecord(addr, dataRec);
+            try {
+              InsertRecord(addr, dataRec);
+            }catch (HexFileException e) {
+              e.filename = filename;
+              e.lineIdx = lineIdx;
+              e.line = lineOrig;
+              throw e;
+            }
             break;
           case 1: // end of file record
             if (line.length() != 15)
@@ -79,7 +86,6 @@ public class IntelHexFile extends HexFileBase{
             break;
           case 2: // 20 bit address block
             addrBase = addr << 4;
-            addr = addrBase;
             if (line.length() < 12)
               throw new HexFileException("Invalid record length", filename, lineOrig, lineIdx);
             break;
