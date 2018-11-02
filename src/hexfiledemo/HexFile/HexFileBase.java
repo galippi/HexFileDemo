@@ -53,7 +53,7 @@ public class HexFileBase {
     if (rec == null)
     {
       rec = new HexFileRecord(address, data);
-      if (beginList.get(address) != null)
+      if (beginList.containsKey(address))
         throw new HexFileException("Overlapping hex file address=" + Integer.toHexString(address), null, null, -1);
       beginList.put(address, rec);
       endList.put(endAddress, rec);
@@ -341,6 +341,18 @@ public class HexFileBase {
         data[j + 2] = tmp;
       }
     }
+  }
+  public byte[] GeData(int address, int len) throws HexFileException
+  {
+    Map.Entry<Integer, Object> entry = beginList.floorEntry(address);
+    HexFileRecord rec = null;
+    if (entry != null)
+      rec = (HexFileRecord)entry.getValue();
+    if ((rec == null) || (rec.end < (address + len)))
+      throw new HexFileException("No data in the given range (" + Integer.toHexString(address) + ", " + len + ")", "", "", -1);
+    byte[] result = new byte[len];
+    java.lang.System.arraycopy(rec.getData(), address - rec.address, result, 0, len);
+    return result;
   }
   TreeMap beginList;
   TreeMap endList;
