@@ -75,6 +75,15 @@ public class HexFileDemo {
       throw new HexFileException("Test case is failed - TestCompareSame failure", filename1 + " - " + filename2, "", -1);
     System.out.println("Test case ok TestCompareSame " + filename1 + " - " + filename2 + "!");
   }
+  static void TestCompareSameSwapU32(String filename1, String filename2) throws HexFileException
+  {
+    HexFileBase file1 = new HexFile(filename1);
+    HexFileBase file2 = new HexFile(filename2);
+    file2.SwapU32();
+    if (file1.compare(file2) != null)
+      throw new HexFileException("Test case is failed - TestCompareSameSwapU32 failure", filename1 + " - " + filename2, "", -1);
+    System.out.println("Test case ok TestCompareSameSwapU32 " + filename1 + " - " + filename2 + "!");
+  }
   static void TestCompareDifferent(String filename1, String filename2, HexBlockHeader[] diff) throws HexFileException
   {
     HexFileBase file1 = new HexFile(filename1);
@@ -170,6 +179,7 @@ public class HexFileDemo {
       TestContent("TestData/a6.s19",   0x123456, data1); // pack testing - S2 record
       TestContent("TestData/a7.s19", 0x87654321, data1); // pack testing - S3 record
       TestContent("TestData/i2.hex",     0x0000, data1);  // basic file load test - intel hex record
+      TestCompareSameSwapU32("TestData/a2.s19", "TestData/a2.swapped.s19");
     }catch (HexFileException e) {
       System.out.println("Error: " + e.toString());
     }
