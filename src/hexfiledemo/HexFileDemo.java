@@ -149,18 +149,6 @@ public class HexFileDemo {
       TestCompareDifferent("TestData/a2.s19", "TestData/i5.3.hex", diff5);
       TestWithException("TestData/a8.s19", "Overlapping hex file address=");
       TestWithException("TestData/a9.s19", "Overlapping hex file address=");
-
-      HexFileBase fileHex = new HexFile("b2.hex");
-      HexFileBase f2 = new HexFile("b2.hex");
-      fileHex.compare(f2);
-      HexFileBase f3 = new HexFile("TestData/a2.s19");
-      HexBlockHeader[] hdr = fileHex.compare(f3);
-      for (int i = 0; i < hdr.length; i++)
-        System.out.println(i + ": " + hdr[i].begin + " len=" + hdr[i].len);
-      fileHex.SwapU32();
-      printHexFile(fileHex);
-      HexFileBase fileS19 = new HexFile("b2.s19");
-      printHexFile(fileS19);
       TestWithException("TestData/a1.s19", "Invalid checksum"); // invalid checksum report
       byte[] data1 = {0x00, 0x5A, (byte)0xA5, (byte)0xFF};
       byte[] data2 = {0x5A, (byte)0xA5};
